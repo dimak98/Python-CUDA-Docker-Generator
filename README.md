@@ -12,7 +12,7 @@ chmod +x ./pycuda.sh
 
 ## Usage
 
-``bash
+```bash
 Usage: ./pycuda.sh --python PYTHON_VERSION --cuda CUDA_VERSION [--requirements REQUIREMENTS_PATH]
 
 Options:
