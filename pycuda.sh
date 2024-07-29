@@ -71,7 +71,7 @@ generate_dockerfile() {
     mkdir -p "${WORKING_DIR}"
 
     local from_lines="FROM ${CUDA_REPO}:${cuda_tag} AS builder
-FROM ${PYTHON_REPO}:${python_tag} AS final"
+    FROM ${PYTHON_REPO}:${python_tag} AS final"
 
     docker_context="$from_lines"
 
@@ -81,36 +81,36 @@ FROM ${PYTHON_REPO}:${python_tag} AS final"
     cuda_minor="${cuda_version_parts[1]}"
 
     local copy_cuda_lines="COPY --from=builder /usr/local/cuda /usr/local/cuda
-COPY --from=builder /usr/local/cuda-${cuda_major} /usr/local/cuda-${cuda_major}
-COPY --from=builder /usr/local/cuda-${cuda_major}.${cuda_minor} /usr/local/cuda-${cuda_major}.${cuda_minor}"
+    COPY --from=builder /usr/local/cuda-${cuda_major} /usr/local/cuda-${cuda_major}
+    COPY --from=builder /usr/local/cuda-${cuda_major}.${cuda_minor} /usr/local/cuda-${cuda_major}.${cuda_minor}"
 
     docker_context="$docker_context
-$copy_cuda_lines"
+    $copy_cuda_lines"
 
     docker_context="$docker_context
-WORKDIR /workspace"
+    WORKDIR /workspace"
 
     if [ ! -z "$requirements_path" ]; then
         cp "${requirements_path}" "${WORKING_DIR}/requirements.txt"
         docker_context="$docker_context
-COPY ./requirements.txt ."
+        COPY ./requirements.txt ."
     fi
 
     local constant_run_line="RUN apt-get update -y && \
-apt-get install -y --no-install-recommends xfce4-terminal gcc glibc* nano vim openjdk-17-jdk openjdk-17-jre byobu && \
-rm -rf /var/lib/apt/lists/* && \
-pip install --upgrade pip"
+    apt-get install -y --no-install-recommends xfce4-terminal gcc glibc* nano vim openjdk-17-jdk openjdk-17-jre byobu && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --upgrade pip"
 
     docker_context="$docker_context
-$constant_run_line"
+    $constant_run_line"
 
     if [ ! -z "$requirements_path" ]; then
         docker_context="$docker_context
-RUN pip install -r ./requirements.txt"
+        RUN pip install -r ./requirements.txt"
     fi
 
     docker_context="$docker_context
-ENTRYPOINT bash"
+    ENTRYPOINT bash"
 
     echo "${docker_context}" | sed 's/^[ \t]*//' | sed 's/\"//g' > "${new_dockerfile_path}"
 
